@@ -1,6 +1,6 @@
 # base image
-ARG ARCH=amd64
-FROM $ARCH/debian:buster-slim
+ARG ARCH=x86_64
+FROM fedora:latest
 
 # args
 ARG VCS_REF
@@ -21,29 +21,27 @@ LABEL maintainer="Florian Schwab <me@ydkn.io>" \
   org.label-schema.build-date=$BUILD_DATE
 
 # install packages
-RUN apt-get update \
-  && apt-get install -y \
+RUN dnf install -y \
   sudo \
   cups \
-  cups-bsd \
   cups-filters \
-  foomatic-db-compressed-ppds \
-  printer-driver-all \
-  openprinting-ppds \
-  hpijs-ppds \
-  hp-ppd \
+  foomatic-db \
+  foomatic-db-ppds \
+  foomatic-db-engine \
+  foomatic \
+  hpijs \
   hplip \
-  && apt-get clean \
-  && rm -rf /var/lib/apt/lists/*
+  && dnf clean all
 
 # add print user
-RUN adduser --home /home/admin --shell /bin/bash --gecos "admin" --disabled-password admin \
-  && adduser admin sudo \
-  && adduser admin lp \
-  && adduser admin lpadmin
+RUN useradd -m -s /bin/bash admin \
+  && usermod -aG wheel admin \
+  && usermod -aG lp admin \
+  && usermod -aG lpadmin admin
 
 # disable sudo password checking
-RUN echo 'admin ALL=(ALL:ALL) ALL' >> /etc/sudoers
+RUN echo 'admin ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers.d/admin \
+  && chmod 0440 /etc/sudoers.d/admin
 
 # enable access to CUPS
 RUN /usr/sbin/cupsd \
