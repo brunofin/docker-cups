@@ -1,3 +1,5 @@
+[![Docker Build and Release](https://github.com/brunofin/docker-cups/actions/workflows/docker-build.yml/badge.svg)](https://github.com/brunofin/docker-cups/actions/workflows/docker-build.yml)
+
 Forked from [https://gitlab.com/ydkn/docker-cups](https://gitlab.com/ydkn/docker-cups)
 
 Objectives:
