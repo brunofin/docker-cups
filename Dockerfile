@@ -30,7 +30,6 @@ RUN dnf install -y \
   foomatic \
   hpijs \
   hplip \
-  hplip-gui \
   wget \
   polkit \
   dbus \
