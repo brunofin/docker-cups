@@ -22,7 +22,6 @@ LABEL maintainer="Bruno Finger <bruno.k.finger@gmail.com>" \
 
 # install packages
 RUN dnf install -y \
-  sudo \
   cups \
   cups-filters \
   foomatic-db \
