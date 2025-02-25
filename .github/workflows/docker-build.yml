@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        arch: [amd64, arm32v7, arm64v8]
+        arch: [amd64, arm64v8]
         include:
           - arch: amd64
             platform: linux/amd64
