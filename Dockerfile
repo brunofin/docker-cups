@@ -26,7 +26,6 @@ RUN dnf install -y \
   cups-filters \
   foomatic-db \
   foomatic-db-ppds \
-  foomatic-db-engine \
   foomatic \
   hpijs \
   hplip \
