@@ -38,8 +38,7 @@ RUN dnf install -y \
 # add print user
 RUN useradd -m -s /bin/bash admin \
   && usermod -aG wheel admin \
-  && usermod -aG lp admin \
-  && usermod -aG lpadmin admin
+  && usermod -aG lp admin
 
 # disable sudo password checking
 RUN echo 'admin ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers.d/admin \
