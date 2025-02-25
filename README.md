@@ -1,3 +1,11 @@
+Forked from [https://gitlab.com/ydkn/docker-cups](https://gitlab.com/ydkn/docker-cups)
+
+Objectives:
+
+* Keep CUPS updated
+* Make it work with HP Printers by automatically setting up `hp-plugin` to fix "Filter Failed" message
+* Maybe switch the base to Fedora Core
+
 # CUPS Docker Image
 
 ## Architectures
