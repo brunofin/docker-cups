@@ -30,6 +30,9 @@ RUN dnf install -y \
   foomatic \
   hpijs \
   hplip \
+  python-gobject \
+  python3-gobject \
+  python3-dbus \
   wget \
   polkit \
   dbus \
