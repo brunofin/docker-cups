@@ -7,6 +7,7 @@ if [ ! -f /etc/cups/cupsd.conf ]; then
 fi
 
 /usr/bin/expect <<'EOF'
+set timeout -1
 spawn hp-plugin -i
 expect {
     -re ".*Enter option.*" { send "d\r"; exp_continue }
