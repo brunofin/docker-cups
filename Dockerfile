@@ -45,18 +45,7 @@ RUN useradd -m -s /bin/bash admin \
 RUN echo 'admin ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers.d/admin \
   && chmod 0440 /etc/sudoers.d/admin
 
-# install HP proprietary plugin
-RUN /usr/bin/expect <<'EOF'
-spawn hp-plugin -i
-expect {
-    -re ".*Enter option.*" { send "d\r"; exp_continue }
-    eof
-}
-expect {
-    -re ".*Do you accept the license terms for the plug-in.*" { send "y\r"; exp_continue }
-    eof
-}
-EOF
+
 
 # enable access to CUPS
 RUN /usr/sbin/cupsd \
