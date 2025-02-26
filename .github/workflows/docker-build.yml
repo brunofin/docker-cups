@@ -28,11 +28,11 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
-      # Log in to the CI registry
-      - name: Login to CI Registry
+      # Login to your container registry
+      - name: Login to Container Registry
         run: docker login -u ${{ secrets.CI_REGISTRY_USER }} -p ${{ secrets.CI_REGISTRY_PASSWORD }} ${{ secrets.CI_REGISTRY }}
 
-      # Define build variables similar to DOCKER_BUILD_ARGS in GitLab
+      # Set build arguments for BUILD_DATE and VCS_REF
       - name: Set Build Date and VCS Ref
         run: |
           echo "BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_ENV
@@ -47,7 +47,7 @@ jobs:
             --build-arg VCS_REF=$VCS_REF \
             -t ${{ secrets.CI_REGISTRY_IMAGE }}:${IMAGE_TAG}-${{ matrix.arch }} .
 
-      # Push the built image
+      # Push the built image to your container registry
       - name: Push image for ${{ matrix.arch }}
         run: docker push ${{ secrets.CI_REGISTRY_IMAGE }}:${IMAGE_TAG}-${{ matrix.arch }}
 
@@ -58,17 +58,18 @@ jobs:
     env:
       IMAGE_TAG: ${{ github.run_id }}
     steps:
-      # Enable Docker experimental features (needed for manifest commands)
+      # Enable Docker experimental features (required for manifest commands)
       - name: Setup Docker Experimental Features
         run: |
           mkdir -p /root/.docker || true
           echo '{"experimental": "enabled"}' > /root/.docker/config.json
 
-      - name: Login to CI Registry
+      # Log in to your container registry
+      - name: Login to Container Registry
         run: docker login -u ${{ secrets.CI_REGISTRY_USER }} -p ${{ secrets.CI_REGISTRY_PASSWORD }} ${{ secrets.CI_REGISTRY }}
 
-      # Pull, tag, and push images to create multi-arch manifest on the CI registry
-      - name: Tag and push images to CI Registry
+      # Tag the images as "latest-arch" and create a multi-arch manifest for "latest"
+      - name: Tag and push images with multi-arch manifest
         run: |
           docker pull ${{ secrets.CI_REGISTRY_IMAGE }}:${IMAGE_TAG}-amd64
           docker tag ${{ secrets.CI_REGISTRY_IMAGE }}:${IMAGE_TAG}-amd64 ${{ secrets.CI_REGISTRY_IMAGE }}:latest-amd64
@@ -86,41 +87,3 @@ jobs:
           docker manifest annotate --os linux --arch arm64 --variant v8 ${{ secrets.CI_REGISTRY_IMAGE }}:latest ${{ secrets.CI_REGISTRY_IMAGE }}:latest-arm64v8
 
           docker manifest push ${{ secrets.CI_REGISTRY_IMAGE }}:latest
-
-  dockerhub:
-    needs: build
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/')
-    env:
-      IMAGE_TAG: ${{ github.run_id }}
-    steps:
-      - name: Setup Docker Experimental Features
-        run: |
-          mkdir -p /root/.docker || true
-          echo '{"experimental": "enabled"}' > /root/.docker/config.json
-
-      - name: Login to CI Registry
-        run: docker login -u ${{ secrets.CI_REGISTRY_USER }} -p ${{ secrets.CI_REGISTRY_PASSWORD }} ${{ secrets.CI_REGISTRY }}
-
-      - name: Login to Docker Hub
-        run: docker login -u ${{ secrets.DOCKERHUB_USER }} -p ${{ secrets.DOCKERHUB_PASSWORD }} ${{ secrets.DOCKERHUB_REGISTRY }}
-
-      # Pull images from the CI registry, retag them, and push to Docker Hub with a multi-arch manifest
-      - name: Tag and push images to Docker Hub
-        run: |
-          docker pull ${{ secrets.CI_REGISTRY_IMAGE }}:${IMAGE_TAG}-amd64
-          docker tag ${{ secrets.CI_REGISTRY_IMAGE }}:${IMAGE_TAG}-amd64 ${{ secrets.DOCKERHUB_IMAGE }}:latest-amd64
-          docker push ${{ secrets.DOCKERHUB_IMAGE }}:latest-amd64
-
-          docker pull ${{ secrets.CI_REGISTRY_IMAGE }}:${IMAGE_TAG}-arm64v8
-          docker tag ${{ secrets.CI_REGISTRY_IMAGE }}:${IMAGE_TAG}-arm64v8 ${{ secrets.DOCKERHUB_IMAGE }}:latest-arm64v8
-          docker push ${{ secrets.DOCKERHUB_IMAGE }}:latest-arm64v8
-
-          docker manifest create ${{ secrets.DOCKERHUB_IMAGE }}:latest \
-            ${{ secrets.DOCKERHUB_IMAGE }}:latest-amd64 \
-            ${{ secrets.DOCKERHUB_IMAGE }}:latest-arm64v8
-
-          docker manifest annotate --os linux --arch amd64 ${{ secrets.DOCKERHUB_IMAGE }}:latest ${{ secrets.DOCKERHUB_IMAGE }}:latest-amd64
-          docker manifest annotate --os linux --arch arm64 --variant v8 ${{ secrets.DOCKERHUB_IMAGE }}:latest ${{ secrets.DOCKERHUB_IMAGE }}:latest-arm64v8
-
-          docker manifest push ${{ secrets.DOCKERHUB_IMAGE }}:latest
