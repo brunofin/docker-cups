@@ -2,6 +2,8 @@
 ARG ARCH=x86_64
 FROM fedora:latest
 
+SHELL ["/bin/bash", "-c"]
+
 # args
 ARG VCS_REF
 ARG BUILD_DATE
