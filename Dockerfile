@@ -47,9 +47,13 @@ RUN echo 'admin ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers.d/admin \
 
 # install HP proprietary plugin
 RUN /usr/bin/expect <<'EOF'
-spawn hp-plugin-download -i
+spawn hp-plugin -i
 expect {
-    -re ".*Do you accept the license terms for the plug-in*" { send "y\r"; exp_continue }
+    -re ".*Enter option.*" { send "d\r"; exp_continue }
+    eof
+}
+expect {
+    -re ".*Do you accept the license terms for the plug-in.*" { send "y\r"; exp_continue }
     eof
 }
 EOF
