@@ -15,7 +15,7 @@ if {$force_conservative} {
 }
 
 set timeout -1
-spawn hp-plugin -i -g
+spawn hp-plugin -i
 match_max 100000
 expect -re ".*Enter option.*"
 sleep 4
