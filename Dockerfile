@@ -22,6 +22,7 @@ LABEL maintainer="Bruno Finger <bruno.k.finger@gmail.com>" \
 
 # install packages
 RUN dnf install -y \
+  expect \
   cups \
   cups-filters \
   foomatic-db \
@@ -45,7 +46,13 @@ RUN echo 'admin ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers.d/admin \
   && chmod 0440 /etc/sudoers.d/admin
 
 # install HP proprietary plugin
-RUN hp-plugin-download
+RUN /usr/bin/expect <<'EOF'
+spawn hp-plugin-download -i
+expect {
+    -re ".*Do you accept the license terms for the plug-in*" { send "y\r"; exp_continue }
+    eof
+}
+EOF
 
 # enable access to CUPS
 RUN /usr/sbin/cupsd \
