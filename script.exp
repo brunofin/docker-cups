@@ -18,7 +18,9 @@ set timeout -1
 spawn hp-plugin -i -g
 match_max 100000
 expect -re ".*Enter option.*"
+sleep 4
 send -- "d\r"
 expect -re ".*Do you accept the license terms for the plug-in.*"
+sleep 5
 send -- "y\r"
 expect eof
