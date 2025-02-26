@@ -58,6 +58,8 @@ RUN cp -rp /etc/cups /etc/cups-skel
 
 # entrypoint
 ADD docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+ADD script.exp /usr/local/bin/script.exp
+
 ENTRYPOINT [ "docker-entrypoint.sh" ]
 
 # default command

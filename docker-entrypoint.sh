@@ -6,6 +6,6 @@ if [ ! -f /etc/cups/cupsd.conf ]; then
   cp -rpn /etc/cups-skel/* /etc/cups/
 fi
 
-/usr/bin/expect script.exp
+/usr/bin/expect /usr/local/bin/script.exp
 
 exec "$@"
