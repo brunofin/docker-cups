@@ -45,7 +45,7 @@ RUN echo 'admin ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers.d/admin \
   && chmod 0440 /etc/sudoers.d/admin
 
 # install HP proprietary plugin
-RUN hp-plugin -i --yes || true
+RUN hp-plugin-download
 
 # enable access to CUPS
 RUN /usr/sbin/cupsd \
