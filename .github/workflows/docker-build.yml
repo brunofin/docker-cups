@@ -65,8 +65,8 @@ jobs:
       # Enable Docker experimental features (required for manifest commands)
       - name: Setup Docker Experimental Features
         run: |
-          mkdir -p /root/.docker || true
-          echo '{"experimental": "enabled"}' > /root/.docker/config.json
+          mkdir -p $HOME/.docker || true
+          echo '{"experimental": "enabled"}' > $HOME/.docker/config.json
 
       # Log in to your container registry
       - name: Login to Container Registry
