@@ -34,6 +34,7 @@ RUN dnf install -y \
   polkit \
   dbus \
   gnupg2 \
+  file \
   && dnf clean all
 
 # add print user
@@ -44,8 +45,6 @@ RUN useradd -m -s /bin/bash admin \
 # disable sudo password checking
 RUN echo 'admin ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers.d/admin \
   && chmod 0440 /etc/sudoers.d/admin
-
-
 
 # enable access to CUPS
 RUN /usr/sbin/cupsd \
