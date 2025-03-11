@@ -3,11 +3,7 @@ name: Docker CI Pipeline
 on:
   push:
     branches:
-      - master
-    tags:
-      - '*'
-  schedule:
-    - cron: '0 * * * *'
+      - main
 
 jobs:
   build:
@@ -72,22 +68,22 @@ jobs:
       - name: Login to Container Registry
         run: docker login -u ${{ secrets.CI_REGISTRY_USER }} -p ${{ secrets.CI_REGISTRY_PASSWORD }} ${{ secrets.CI_REGISTRY }}
 
-      # Tag the images as "latest-arch" and create a multi-arch manifest for "latest"
+      # Tag the images as "base-arch" and create a multi-arch manifest for "base"
       - name: Tag and push images with multi-arch manifest
         run: |
           docker pull ${{ secrets.CI_REGISTRY_IMAGE }}:${IMAGE_TAG}-amd64
-          docker tag ${{ secrets.CI_REGISTRY_IMAGE }}:${IMAGE_TAG}-amd64 ${{ secrets.CI_REGISTRY_IMAGE }}:latest-amd64
-          docker push ${{ secrets.CI_REGISTRY_IMAGE }}:latest-amd64
+          docker tag ${{ secrets.CI_REGISTRY_IMAGE }}:${IMAGE_TAG}-amd64 ${{ secrets.CI_REGISTRY_IMAGE }}:base-amd64
+          docker push ${{ secrets.CI_REGISTRY_IMAGE }}:base-amd64
 
           docker pull ${{ secrets.CI_REGISTRY_IMAGE }}:${IMAGE_TAG}-arm64v8
-          docker tag ${{ secrets.CI_REGISTRY_IMAGE }}:${IMAGE_TAG}-arm64v8 ${{ secrets.CI_REGISTRY_IMAGE }}:latest-arm64v8
-          docker push ${{ secrets.CI_REGISTRY_IMAGE }}:latest-arm64v8
+          docker tag ${{ secrets.CI_REGISTRY_IMAGE }}:${IMAGE_TAG}-arm64v8 ${{ secrets.CI_REGISTRY_IMAGE }}:base-arm64v8
+          docker push ${{ secrets.CI_REGISTRY_IMAGE }}:base-arm64v8
 
-          docker manifest create ${{ secrets.CI_REGISTRY_IMAGE }}:latest \
-            ${{ secrets.CI_REGISTRY_IMAGE }}:latest-amd64 \
-            ${{ secrets.CI_REGISTRY_IMAGE }}:latest-arm64v8
+          docker manifest create ${{ secrets.CI_REGISTRY_IMAGE }}:base \
+            ${{ secrets.CI_REGISTRY_IMAGE }}:base-amd64 \
+            ${{ secrets.CI_REGISTRY_IMAGE }}:base-arm64v8
 
-          docker manifest annotate --os linux --arch amd64 ${{ secrets.CI_REGISTRY_IMAGE }}:latest ${{ secrets.CI_REGISTRY_IMAGE }}:latest-amd64
-          docker manifest annotate --os linux --arch arm64 --variant v8 ${{ secrets.CI_REGISTRY_IMAGE }}:latest ${{ secrets.CI_REGISTRY_IMAGE }}:latest-arm64v8
+          docker manifest annotate --os linux --arch amd64 ${{ secrets.CI_REGISTRY_IMAGE }}:base ${{ secrets.CI_REGISTRY_IMAGE }}:base-amd64
+          docker manifest annotate --os linux --arch arm64 --variant v8 ${{ secrets.CI_REGISTRY_IMAGE }}:base ${{ secrets.CI_REGISTRY_IMAGE }}:base-arm64v8
 
-          docker manifest push ${{ secrets.CI_REGISTRY_IMAGE }}:latest
+          docker manifest push ${{ secrets.CI_REGISTRY_IMAGE }}:base
